@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+	<springProperty name="app_name" source="spring.application.name" defaultValue="demo-app"/>
+	
+	<property name="defaultPattern" value="%d{yy-MM-dd'T'HH:mm:ss.SSSZ} [%thread] %.-5level [%-30c{10}] %msg" />
+	
+	<conversionRule conversionWord="instance" converterClass="net.logstash.logback.stacktrace.ServerInstanceConverter" />
+	
+	<conversionRule conversionWord="exceptionname" converterClass="com.monka.poclogging.config.logging.converter.ExceptionNameConverter" />
+	<property name="defaultPatternJSON" 
+			  value="{
+			  &quot;@timestamp&quot;:&quot;%d{yy-MM-dd'T'HH:mm:ss.SSSZ}&quot;,
+			  &quot;level&quot;:&quot;%.-5level&quot;,
+			  &quot;e2erequestid&quot;:&quot;%X{e2erequestid}&quot;,
+			  &quot;transactionid&quot;:&quot;%X{transactionid}&quot;,
+			  &quot;starttime&quot;:&quot;%X{starttime}&quot;,
+			  &quot;calledby&quot;:&quot;%X{calledby}&quot;,
+			  &quot;requesturi&quot;:&quot;%X{requesturi}&quot;,
+			  &quot;msg&quot;:&quot;%message&quot;,
+			  &quot;exception&quot;:&quot;%exception&quot;,
+			  &quot;exception_name&quot;:&quot;%exceptionname&quot;,
+			  &quot;class&quot;:&quot;%exceptionname&quot;
+			  }"
+			  
+			  />
+	<property name="log.date" value="%{yyyy-MM-dd}"/>
+	<timestamp key="logStartTime" datePattern="yyyyMMdd'T'HHmmss" timeReference="contextBirth" />
+	
+	<logger name="com.monka" level="INFO" />
+	<logger name="org.springframework" level="INFO" />
+	<logger name="org.springframework.web.servlet" level="INFO" />
+</included>

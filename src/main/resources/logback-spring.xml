@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true" scan="true" scanPeriod="300 seconds">
+	<include resource="logback-common.xml" />
+	
+	<springProperty name="asyncAppenderDiscardingThreshold" source="log.appender.discarding-threshold" defaultValue="20"/>
+	
+	<springProperty name="asyncAppenderQueueSize" source="log.appender.queue-size" defaultValue="256"/>
+	
+	<springProperty name="asyncAppenderNeverBlock" source="log.appender.never-block" defaultValue="true"/>
+	
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<if condition='property("logdefaultpattern").contains("true")'>
+			<then>
+				<encoder>
+					<pattern>${defaultPattern}%n</pattern>
+				</encoder>
+			</then>
+			<else>
+				<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+					<providers>
+						<pattern>
+							<omitEmptyFields>true</omitEmptyFields>
+							<pattern>${defaultPatternJSON}%n</pattern>
+						</pattern>
+					</providers>
+				</encoder>
+			</else>
+		</if>
+	</appender>
+	<appender name="async-appender" class="com.monka.poclogging.config.logging.appender.BaseAsyncAppender">
+		<!-- <discardingThreshold>${asyncAppenderDiscardingThreshold}</discardingThreshold>
+		<queueSize>${asyncAppenderQueueSize}</queueSize>
+		<neverBlock>${asyncAppenderNeverBlock}</neverBlock> -->
+		<appender-ref ref="console" />
+	</appender>
+	<appender name="sync-appender" class="com.monka.poclogging.config.logging.appender.BaseSyncAppender">
+		
+		<if condition='property("logdefaultpattern").contains("true")'>
+			<then>
+				<encoder>
+					<pattern>${defaultPattern}%n</pattern>
+				</encoder>
+			</then>
+			<else>
+				<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+					<providers>
+						<pattern>
+							<omitEmptyFields>true</omitEmptyFields>
+							<pattern>${defaultPatternJSON}%n</pattern>
+						</pattern>
+					</providers>
+				</encoder>
+			</else>
+		</if>
+	</appender>
+	<appender name="console-test" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${samplePatternJSON}%n</pattern>
+		</encoder>
+	</appender>
+	
+	<logger name="com.monka" level="INFO" additivity="false">
+		<if condition='property("log.appender.sync").contains("true")'>
+			<then>
+				<appender-ref ref="sync-appender" />
+			</then>
+			<else>
+				<appender-ref ref="async-appender" />
+			</else>
+		</if>
+	</logger>
+	<root level="INFO">
+		<if condition='property("log.appender.sync").contains("true")'>
+			<then>
+				<appender-ref ref="sync-appender" />
+			</then>
+			<else>
+				<appender-ref ref="async-appender" />
+			</else>
+		</if>
+	</root>
+	
+</configuration>
+
